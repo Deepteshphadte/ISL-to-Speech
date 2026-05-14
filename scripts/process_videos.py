@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.preprocessing import normalize_landmarks
 
 # ─── CONFIG ─────────────────────────────────────────────────────
-DATASET_PATH = "dataset/greeting"
+DATASET_PATH = "dataset/words"
 OUTPUT_PATH = "data/processed"
 
 SEQUENCE_LENGTH = 30
