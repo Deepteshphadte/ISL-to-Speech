@@ -3,6 +3,9 @@ __pycache__/
 *.pyc
 *.pyo
 
+# Raw video dataset
+dataset/
+
 # Virtual Environment
 venv/
 

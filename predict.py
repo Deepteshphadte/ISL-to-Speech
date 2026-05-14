@@ -11,9 +11,9 @@ from utils.preprocessing import normalize_landmarks
 MODEL_PATH           = "models/lstm_model.pth"
 LABELS_PATH          = "data/labels.npy"
 SEQUENCE_LENGTH      = 30
-CONFIDENCE_THRESHOLD = 0.75
-PRED_QUEUE_SIZE      = 10
-LETTER_COOLDOWN      = 20
+CONFIDENCE_THRESHOLD = 0.40
+PRED_QUEUE_SIZE      = 5
+LETTER_COOLDOWN      = 10
 NO_HAND_RESET        = 30
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -160,6 +160,10 @@ def run():
                         output = model(input_tensor)
                         probs  = torch.softmax(output, dim=1)
                         conf, pred_class = torch.max(probs, dim=1)
+                        print(
+                            f"Prediction: {labels[pred_class.item()]} | "
+                            f"Confidence: {conf.item():.2f}"
+                        )
 
                     confidence = conf.item()
                     pred_class = pred_class.item()
