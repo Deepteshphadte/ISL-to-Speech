@@ -11,7 +11,7 @@ LETTERS = [chr(i) for i in range(ord('A'), ord('Z') + 1)]          # A-Z
 NUMBERS = [str(i) for i in range(1, 10)]                            # 1-9
 WORDS   = [
     "HELLO", "GOOD", "BAD", "YES", "NO",
-    "THANKYOU", "SORRY", "HELP", "PLEASE", "ILOVEYOU"
+    "THANK_YOU", "SORRY", "HELP", "PLEASE", "I_LOVE_YOU"
 ]
 SPECIAL = ["NONE"]
 
@@ -26,7 +26,7 @@ def print_menu():
     print("Letters  : A - Z")
     print("Numbers  : 1 - 9")
     print("Words    : HELLO, GOOD, BAD, YES, NO,")
-    print("           THANKYOU, SORRY, HELP, PLEASE, ILOVEYOU")
+    print("           THANK_YOU, SORRY, HELP, PLEASE, I_LOVE_YOU")
     print("Special  : NONE  (no gesture / background)")
     print("-"*55)
     print("Type the label to collect data for it.")
