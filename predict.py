@@ -24,7 +24,7 @@ NO_HAND_RESET = 20
 
 # ─── UI Colors ───────────────────────────────────────
 BG_COLOR = (20, 20, 20)
-PANEL_COLOR = (40, 40, 40)
+PANEL_COLOR = (10, 10, 10)
 TEXT_COLOR = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (0, 0, 255)
@@ -110,137 +110,199 @@ def extract_landmarks(results):
     return normalize_landmarks(combined)
 
 
-def draw_ui(frame, current_sign, sentence, confidence):
+def draw_ui(frame, current_sign, sentence, confidence, fps):
 
     h, w = frame.shape[:2]
 
     overlay = frame.copy()
 
-    # Top Header
+    # ─── TOP BAR ─────────────────────────────
     cv2.rectangle(
         overlay,
         (0, 0),
-        (w, 90),
-        PANEL_COLOR,
+        (w, 70),
+        (10, 10, 10),
         -1
     )
 
-    # Bottom Panel
+    # ─── BOTTOM BAR ──────────────────────────
     cv2.rectangle(
         overlay,
-        (0, h - 140),
+        (0, h - 110),
         (w, h),
-        PANEL_COLOR,
+        (10, 10, 10),
         -1
     )
 
-    # Blend panels
     cv2.addWeighted(
         overlay,
-        0.7,
+        0.70,
         frame,
-        0.3,
+        0.30,
         0,
         frame
     )
 
-    # Title
+    # ─── TITLE ───────────────────────────────
     cv2.putText(
         frame,
-        "Indian Sign Language Recognition",
-        (20, 40),
+        "ISL to Speech Converter",
+        (20, 42),
         cv2.FONT_HERSHEY_SIMPLEX,
-        1,
+        0.9,
         YELLOW,
         2
     )
 
-    # Current Sign
-    color = GREEN if current_sign != "No Sign" else RED
+    # ─── STATUS ──────────────────────────────
+    status = "ACTIVE" if current_sign != "No Sign" else "IDLE"
+
+    status_color = GREEN if status == "ACTIVE" else RED
 
     cv2.putText(
         frame,
-        f"Sign: {current_sign}",
-        (20, 80),
+        f"Status: {status}",
+        (w - 220, 28),
         cv2.FONT_HERSHEY_SIMPLEX,
-        1.2,
-        color,
-        3
+        0.45,
+        status_color,
+        1
     )
 
-    # Confidence Bar at Bottom
+    # ─── FPS ─────────────────────────────────
+    cv2.putText(
+        frame,
+        f"FPS: {int(fps)}",
+        (w - 130, 55),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.5,
+        GREEN,
+        1
+    )
+
+    # ─── CURRENT SIGN BOX ────────────────────
+    cv2.rectangle(
+        frame,
+        (20, 85),
+        (180, 165),
+        (40, 40, 40),
+        -1
+    )
+
+    cv2.rectangle(
+        frame,
+        (20, 85),
+        (180, 165),
+        (180, 180, 180),
+        1
+    )
+
+    cv2.putText(
+        frame,
+        "Current Sign",
+        (32, 110),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.45,
+        YELLOW,
+        1
+    )
+
+    sign_color = GREEN if current_sign != "No Sign" else RED
+
+    cv2.putText(
+        frame,
+        current_sign,
+        (32, 145),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.8,
+        sign_color,
+        2
+    )
+
+    # ─── CONFIDENCE ──────────────────────────
     if current_sign != "No Sign":
 
-        # Confidence label
         cv2.putText(
             frame,
             "Confidence",
-            (20, h - 125),
+            (20, h - 72),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.6,
+            0.45,
+            YELLOW,
+            1
+        )
+
+        # Bar outline
+        cv2.rectangle(
+            frame,
+            (120, h - 82),
+            (300, h - 62),
+            (255, 255, 255),
+            1
+        )
+
+        # Filled confidence
+        bar_width = int(confidence * 180)
+
+        bar_color = GREEN if confidence > 0.9 else RED
+
+        cv2.rectangle(
+            frame,
+            (120, h - 82),
+            (120 + bar_width, h - 62),
+            bar_color,
+            -1
+        )
+
+        cv2.putText(
+            frame,
+            f"{confidence*100:.0f}%",
+            (315, h - 66),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.45,
             TEXT_COLOR,
             1
         )
 
-        # Background bar
-        cv2.rectangle(
-            frame,
-            (150, h - 140),
-            (420, h - 110),
-            (70, 70, 70),
-            -1
-        )
-
-        # Filled confidence bar
-        bar_width = int(confidence * 270)
-
-        cv2.rectangle(
-            frame,
-            (150, h - 140),
-            (150 + bar_width, h - 110),
-            GREEN,
-            -1
-        )
-
-        # Percentage text
-        cv2.putText(
-            frame,
-            f"{confidence*100:.1f}%",
-            (430, h - 118),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.6,
-            TEXT_COLOR,
-            2
-        )
-    # Sentence Box
+    # ─── RECOGNIZED TEXT ─────────────────────
     cv2.putText(
         frame,
-        "Recognized Text:",
-        (20, h - 90),
+        "Recognized:",
+        (20, h - 28),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.7,
+        0.5,
         YELLOW,
-        2
+        1
     )
 
     cv2.putText(
         frame,
-        sentence,
-        (20, h - 45),
+        sentence[-35:],
+        (140, h - 28),
         cv2.FONT_HERSHEY_SIMPLEX,
-        1,
+        0.55,
         TEXT_COLOR,
-        2
+        1
     )
 
-    # Controls
+    # ─── CONTROLS ────────────────────────────
     cv2.putText(
         frame,
-        "[C] Clear   [Q] Quit",
-        (w - 260, h - 20),
+        "[C] Clear",
+        (w - 180, h - 55),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.6,
-        (180, 180, 180),
+        0.45,
+        TEXT_COLOR,
+        1
+    )
+
+    cv2.putText(
+        frame,
+        "[Q] Quit",
+        (w - 180, h - 25),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.45,
+        TEXT_COLOR,
         1
     )
 
@@ -285,6 +347,7 @@ def run():
     prediction_queue = deque(maxlen=PRED_QUEUE_SIZE)
 
     sentence = ""
+    sentence_buffer = []
     last_sign = ""
 
     no_hand_counter = 0
@@ -303,6 +366,17 @@ def run():
     ) as hands:
 
         print("Starting prediction... Press 'q' to quit.")
+
+        cv2.namedWindow(
+            "ISL Recognition",
+            cv2.WND_PROP_FULLSCREEN
+        )
+
+        cv2.setWindowProperty(
+            "ISL Recognition",
+            cv2.WND_PROP_FULLSCREEN,
+            cv2.WINDOW_FULLSCREEN
+        )
 
         while True:
 
@@ -326,6 +400,8 @@ def run():
             if not results.multi_hand_landmarks:
 
                 current_sign = "No Sign"
+
+                confidence = 0.0
 
                 no_hand_counter += 1
 
@@ -376,7 +452,10 @@ def run():
 
                         conf, pred_class = torch.max(probs, dim=1)
 
-                    confidence = conf.item()
+                    raw_confidence = conf.item()
+
+                    # Live dynamic confidence for UI
+                    confidence = raw_confidence
 
                     pred_label = labels[pred_class.item()]
 
@@ -386,9 +465,11 @@ def run():
                     )
 
                     # Ignore weak predictions
-                    if confidence < CONFIDENCE_THRESHOLD:
+                    if raw_confidence < CONFIDENCE_THRESHOLD:
 
                         current_sign = "No Sign"
+
+                        confidence = 0.0
 
                         last_sign = ""
 
@@ -397,6 +478,7 @@ def run():
                     else:
 
                         prediction_queue.append(pred_label)
+                        confidence = raw_confidence
 
                         # Stable prediction
                         final_sign = max(
@@ -407,6 +489,8 @@ def run():
                         if final_sign == "NONE":
 
                             current_sign = "No Sign"
+
+                            confidence = 0.0
 
                             last_sign = ""
 
@@ -420,7 +504,9 @@ def run():
                                 sentence = refine_text(current_sign)
 
                                 last_sign = current_sign
-                                
+                                if len(sentence_buffer) == 0 or sentence_buffer[-1] != current_sign:
+                                     sentence_buffer.append(current_sign)
+                                sentence = refine_text(sentence_buffer)
 
                                 print(
                                     f"Added: {current_sign} | "
@@ -439,36 +525,33 @@ def run():
             # ─────────────────────────────────────────────
             # DRAW UI
             # ─────────────────────────────────────────────
-            frame = draw_ui(
-                frame,
-                current_sign,
-                sentence,
-                confidence
-            )
-
-            h, w = frame.shape[:2]
-
             curr_time = time.time()
 
             fps = 1 / (curr_time - prev_time + 1e-5)
 
             prev_time = curr_time
 
-            cv2.putText(
+            
+            frame = draw_ui(
                 frame,
-                f"FPS: {int(fps)}",
-                (w - 160, 85),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.7,
-                GREEN,
-                2
+                current_sign,
+                sentence,
+                confidence,
+                fps
             )
+
+            h, w = frame.shape[:2]
+
+            
+            status = "ACTIVE" if current_sign != "No Sign" else "IDLE"
+
+            status_color = GREEN if "ACTIVE" in status else RED
+
 
             cv2.imshow(
                 "ISL Recognition",
                 frame
             )
-
             key = cv2.waitKey(1) & 0xFF
 
             if key == ord('q'):
@@ -477,6 +560,8 @@ def run():
             elif key == ord('c'):
 
                 sentence = ""
+
+                sentence_buffer.clear()
 
                 last_sign = ""
 

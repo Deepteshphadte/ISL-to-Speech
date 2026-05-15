@@ -1,45 +1,34 @@
-def refine_text(text):
+def refine_text(words):
 
-    text = text.upper().strip()
+    if not words:
+        return ""
 
-    rules = {
-
-        "HELLO": "Hello!",
-
-        "THANK_YOU": "Thank you.",
-
-        "I_LOVE_YOU": "I love you.",
-
-        "HELP": "Please help me.",
-
-        "PLEASE": "Please.",
-
-        "SORRY": "I am sorry.",
-
-        "GOOD": "Good.",
-
-        "BAD": "That is bad.",
-
-        "YES": "Yes.",
-
-        "NO": "No."
-    }
-
-    # Exact match
-    if text in rules:
-        return rules[text]
-
-    # Multi-word refinement
-    words = text.split()
-
-    refined = []
+    refined_sentences = []
 
     for word in words:
 
-        if word in rules:
-            refined.append(rules[word])
+        if word == "HELLO":
+            refined_sentences.append("Hello!")
+
+        elif word == "HELP":
+            refined_sentences.append("Please help me.")
+
+        elif word == "THANK_YOU":
+            refined_sentences.append("Thank you.")
+
+        elif word == "I_LOVE_YOU":
+            refined_sentences.append("I love you.")
+
+        elif word == "SORRY":
+            refined_sentences.append("I am sorry.")
+
+        elif word == "YES":
+            refined_sentences.append("Yes.")
+
+        elif word == "NO":
+            refined_sentences.append("No.")
 
         else:
-            refined.append(word.capitalize())
+            refined_sentences.append(word.capitalize())
 
-    return " ".join(refined)
+    return " ".join(refined_sentences)
