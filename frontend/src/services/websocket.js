@@ -1,27 +1,46 @@
 let socket = null;
 
-export const connectWebSocket = (onMessage) => {
+export const connectWebSocket = (
+    onMessage,
+    onOpen,
+    onClose
+) => {
 
-  socket = new WebSocket(
-    "ws://127.0.0.1:8000/ws"
-  );
+    socket = new WebSocket(
+        "ws://127.0.0.1:8000/ws"
+    );
 
-  socket.onopen = () => {
-    console.log("WebSocket Connected");
-  };
+    socket.onopen = () => {
 
-  socket.onmessage = (event) => {
+        console.log(
+            "WebSocket Connected"
+        );
 
-    const data = JSON.parse(event.data);
+        if (onOpen)
+            onOpen();
+    };
 
-    onMessage(data);
-  };
+    socket.onmessage = (event) => {
 
-  socket.onclose = () => {
-    console.log("WebSocket Closed");
-  };
+        const data = JSON.parse(
+            event.data
+        );
 
-  return socket;
+        onMessage(data);
+    };
+
+    socket.onclose = () => {
+
+        console.log(
+            "WebSocket Closed"
+        );
+
+        if (onClose)
+            onClose();
+    };
+
+    return socket;
 };
 
-export const getSocket = () => socket;
+export const getSocket = () =>
+    socket;

@@ -162,7 +162,7 @@ class Predictor:
     def predict(self, frame):
 
 
-        frame = cv2.flip(frame, 1)
+       # frame = cv2.flip(frame, 1)
 
         rgb = cv2.cvtColor(
             frame,
@@ -170,7 +170,20 @@ class Predictor:
         )
 
         results = self.hands.process(rgb)
+        landmarks_to_send = []
         if results.multi_hand_landmarks:
+            for hand in results.multi_hand_landmarks:
+
+                hand_points = []
+
+                for lm in hand.landmark:
+
+                    hand_points.append({
+                        "x": lm.x,
+                        "y": lm.y
+                    })
+
+                landmarks_to_send.append(hand_points)
             print("HAND DETECTED")
         else:
             print("NO HAND")
@@ -198,7 +211,8 @@ class Predictor:
                 "confidence": self.confidence,
                 "sentence": " ".join(
                     self.sentence_buffer
-                )
+                ),
+                "landmarks": landmarks_to_send
             }
 
         self.no_hand_counter = 0
@@ -206,6 +220,20 @@ class Predictor:
         landmarks = self.extract_landmarks(
             results
         )
+        display_landmarks = []
+
+        for hand in results.multi_hand_landmarks:
+
+            one_hand = []
+
+            for lm in hand.landmark:
+
+                one_hand.append({
+                    "x": lm.x,
+                    "y": lm.y
+                })
+
+            display_landmarks.append(one_hand)
 
         self.sequence.append(
             landmarks
@@ -223,7 +251,8 @@ class Predictor:
                 "confidence": 0.0,
                 "sentence": " ".join(
                     self.sentence_buffer
-                )
+                ),
+                "landmarks": display_landmarks
             }
 
         input_tensor = torch.tensor(
@@ -271,7 +300,8 @@ class Predictor:
                 "confidence": 0.0,
                 "sentence": " ".join(
                     self.sentence_buffer
-                )
+                ),
+                "landmarks": []
             }
 
         self.prediction_queue.append(
@@ -290,7 +320,8 @@ class Predictor:
                 "confidence": 0.0,
                 "sentence": " ".join(
                     self.sentence_buffer
-                )
+                ),
+                "landmarks": []
             }
 
         self.current_sign = final_sign
@@ -326,5 +357,6 @@ class Predictor:
             ),
             "sentence": " ".join(
                 self.sentence_buffer
-            )
+            ),
+            "landmarks": display_landmarks
         }

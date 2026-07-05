@@ -6,16 +6,37 @@ function HistoryPanel() {
   const { history } =
     useContext(PredictionContext);
 
+  const uniqueHistory = [
+    ...new Set(
+      history.slice(-15)
+    )
+  ];
+
   return (
+
     <div className="card">
 
-      <h2>History</h2>
+      <h2>Recent Predictions</h2>
 
-      {history.map((item, index) => (
-        <p key={index}>{item}</p>
-      ))}
+      <div className="history-chips">
+
+        {uniqueHistory.map(
+          (item, index) => (
+
+            <span
+              key={index}
+              className="history-chip"
+            >
+              {item}
+            </span>
+
+          )
+        )}
+
+      </div>
 
     </div>
+
   );
 }
 

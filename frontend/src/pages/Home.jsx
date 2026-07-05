@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import Header from "../components/Header";
 import WebcamFeed from "../components/WebcamFeed";
 import PredictionBox from "../components/PredictionBox";
@@ -12,30 +12,90 @@ import {
 } from "../services/websocket";
 import { PredictionContext } from "../context/PredictionContext";
 import "../styles/main.css";
+import ConnectionStatus
+from "../components/ConnectionStatus";
+import StatusCard
+from "../components/StatusCard";
 
 function Home() {
     const {
   setCurrentSign,
   setConfidence,
   setSentence,
-  setHistory
+  setHistory,
+  autoSpeak,
+  setConnectionStatus,
+  setLandmarks
 } = useContext(PredictionContext);
+
+const lastSentenceRef = useRef("");
+const autoSpeakRef = useRef(autoSpeak);
+
 useEffect(() => {
 
-  const ws = connectWebSocket((data) => {
+  autoSpeakRef.current = autoSpeak;
 
-    setCurrentSign(data.sign);
+}, [autoSpeak]);
 
-    setConfidence(data.confidence);
+useEffect(() => {
 
-    setSentence(data.sentence);
+  const ws = connectWebSocket(
 
-    setHistory((prev) => [
-      ...prev,
-      data.sign
-    ]);
+    (data) => {
 
-  });
+      setCurrentSign(data.sign);
+
+      setConfidence(data.confidence);
+
+      setSentence(data.sentence);
+      setLandmarks(data.landmarks);
+      if (
+        autoSpeakRef.current &&
+        data.sentence &&
+        data.sentence !== lastSentenceRef.current
+      ) {
+
+        const utterance =
+          new SpeechSynthesisUtterance(
+            data.sentence
+          );
+
+        window.speechSynthesis.speak(
+          utterance
+        );
+
+        lastSentenceRef.current =
+          data.sentence;
+      }
+
+      setHistory((prev) => {
+
+        if (
+          prev[prev.length - 1]
+          === data.sign
+        ) {
+          return prev;
+        }
+
+        return [
+          ...prev,
+          data.sign
+        ];
+      });
+    },
+
+    () => {
+      setConnectionStatus(
+        "Connected"
+      );
+    },
+
+    () => {
+      setConnectionStatus(
+        "Disconnected"
+      );
+    }
+  );
 
 
   return () => ws.close();
@@ -76,6 +136,8 @@ const speak = (text) => {
         </div>
 
         <div className="right-panel">
+          <ConnectionStatus />
+          <StatusCard />
           <PredictionBox />
           <SentenceBox />
           <Controls speak={speak} />

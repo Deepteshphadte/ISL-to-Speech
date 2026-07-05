@@ -27,9 +27,24 @@ def home():
 @app.get("/status")
 def status():
     return {
-        "status": "online",
-        "backend": "FastAPI",
-        "model": "not loaded"
+        "backend": "online",
+        "model": "loaded",
+        "camera": "active"
+    }
+
+@app.post("/clear")
+def clear_sentence():
+
+    predictor.sentence_buffer.clear()
+    predictor.prediction_queue.clear()
+    predictor.sequence.clear()
+
+    predictor.last_sign = ""
+    predictor.current_sign = "No Sign"
+    predictor.confidence = 0.0
+
+    return {
+        "message": "cleared"
     }
 
 @app.websocket("/ws")
@@ -57,10 +72,8 @@ async def websocket_endpoint(websocket: WebSocket):
             cv2.IMREAD_COLOR
         )
 
-        result = predictor.predict(
-            frame
-        )
+        result = predictor.predict(frame)
 
-        await websocket.send_json(
-            result
-        )
+        print("Sending:", result["sign"])
+
+        await websocket.send_json(result)
