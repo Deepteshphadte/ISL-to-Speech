@@ -6,45 +6,120 @@ from utils.mediapipe_utils import collect_data
 
 # rest of the code stays the same...
 
-# ─── All supported gestures ───────────────────────────────────────────────────
-LETTERS = [chr(i) for i in range(ord('A'), ord('Z') + 1)]          # A-Z
-NUMBERS = [str(i) for i in range(1, 10)]                            # 1-9
-WORDS   = [
-    "HELLO", "GOOD", "BAD", "YES", "NO",
-    "THANK_YOU", "SORRY", "HELP", "PLEASE", "I_LOVE_YOU"
-]
-SPECIAL = ["NONE"]
 
-ALL_LABELS = LETTERS + NUMBERS + WORDS + SPECIAL
-# ──────────────────────────────────────────────────────────────────────────────
+LABELS_FILE = "data/labels.txt"
+DATASET_PATH = "data/processed"
+
+
+def load_labels():
+
+    with open(LABELS_FILE, "r") as file:
+
+        labels = [
+
+            line.strip().upper()
+
+            for line in file
+
+            if line.strip()
+
+        ]
+
+    return labels
+
+def show_dataset_status():
+
+    labels = load_labels()
+
+    print("\n" + "=" * 65)
+    print("                 DATASET STATUS")
+    print("=" * 65)
+
+    completed = 0
+
+    for label in labels:
+
+        folder = os.path.join(
+            DATASET_PATH,
+            label
+        )
+
+        if os.path.exists(folder):
+
+            count = len([
+                file
+                for file in os.listdir(folder)
+                if file.endswith(".npy")
+            ])
+
+        else:
+
+            count = 0
+
+        if count >= 200:
+
+            status = "✅ Complete"
+            completed += 1
+
+        elif count >= 100:
+
+            status = "⚠ Good"
+
+        elif count > 0:
+
+            status = "❌ Need More"
+
+        else:
+
+            status = "⭕ Missing"
+
+        print(
+            f"{label:<20}"
+            f"{count:<10}"
+            f"{status}"
+        )
+
+    print("=" * 65)
+
+    print(f"Total Labels : {len(labels)}")
+    print(f"Completed    : {completed}")
+    print(f"Remaining    : {len(labels)-completed}")
 
 
 def print_menu():
-    print("\n" + "="*55)
-    print("       ISL DATA COLLECTION TOOL")
-    print("="*55)
-    print("Letters  : A - Z")
-    print("Numbers  : 1 - 9")
-    print("Words    : HELLO, GOOD, BAD, YES, NO,")
-    print("           THANK_YOU, SORRY, HELP, PLEASE, I_LOVE_YOU")
-    print("Special  : NONE  (no gesture / background)")
-    print("-"*55)
-    print("Type the label to collect data for it.")
-    print("Type 'LIST' to see all labels.")
-    print("Type 'EXIT' to quit.")
-    print("="*55)
+
+    labels = load_labels()
+
+    print("\n" + "=" * 60)
+    print("         ISL DATA COLLECTION TOOL")
+    print("=" * 60)
+    print("STATUS -> View Dataset Progress")
+
+    print(f"\nTotal Supported Labels : {len(labels)}")
+
+    print("\nCommands")
+    print("LIST  -> Show all labels")
+    print("STATUS -> View Dataset Progress")
+    print("EXIT  -> Quit")
+
+    print("=" * 60)
 
 
 def print_all_labels():
-    print("\nAll supported labels:")
-    print(f"  Letters : {' '.join(LETTERS)}")
-    print(f"  Numbers : {' '.join(NUMBERS)}")
-    print(f"  Words   : {' '.join(WORDS)}")
-    print(f"  Special : {' '.join(SPECIAL)}")
+
+    labels = load_labels()
+
+    print("\nAvailable Labels\n")
+
+    for i, label in enumerate(labels, start=1):
+
+        print(f"{i:3}. {label}")
 
 
 if __name__ == "__main__":
     print_menu()
+
+    ALL_LABELS = load_labels()
 
     while True:
         label = input("\nEnter label: ").strip().upper()
@@ -55,6 +130,10 @@ if __name__ == "__main__":
 
         elif label == "LIST":
             print_all_labels()
+
+        elif label == "STATUS":
+
+            show_dataset_status()
 
         elif label in ALL_LABELS:
             print(f"\nStarting collection for: {label}")

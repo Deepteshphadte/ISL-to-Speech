@@ -20,3 +20,7 @@ models/lstm_model.pth
 # OS files
 .DS_Store
 Thumbs.db
+
+# React
+node_modules/
+frontend/node_modules/

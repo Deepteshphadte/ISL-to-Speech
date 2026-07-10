@@ -4,16 +4,21 @@ import numpy as np
 # ─── Config ───────────────────────────────────────────────────────────────────
 DATA_PATH = "data/processed"
 SAVE_PATH = "data"
+LABELS_FILE = "data/labels.txt"
 # ──────────────────────────────────────────────────────────────────────────────
 
 def load_dataset():
-    # Get all label folders sorted
-    all_labels = sorted(os.listdir(DATA_PATH))
+    with open(LABELS_FILE, "r") as f:
 
-    # Move NONE to end if it exists (so index is always last)
-    if "NONE" in all_labels:
-        all_labels.remove("NONE")
-        all_labels.append("NONE")
+        all_labels = [
+
+            line.strip()
+
+            for line in f
+
+            if line.strip()
+
+        ]
 
     label_map = {label: idx for idx, label in enumerate(all_labels)}
 
@@ -26,7 +31,21 @@ def load_dataset():
     for label in all_labels:
         folder_path = os.path.join(DATA_PATH, label)
 
-        npy_files = [f for f in os.listdir(folder_path) if f.endswith(".npy")]
+        if not os.path.exists(folder_path):
+
+            print(f"[WARNING] Folder not found: {label}")
+
+            continue
+
+        npy_files = [
+
+            f
+
+            for f in os.listdir(folder_path)
+
+            if f.endswith(".npy")
+
+        ]
 
         if len(npy_files) == 0:
             print(f"  [WARNING] No samples found for label: {label}")
