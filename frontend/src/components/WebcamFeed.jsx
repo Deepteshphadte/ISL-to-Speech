@@ -70,8 +70,12 @@ function WebcamFeed({ sendFrame }) {
               p2.y * canvas.height
           );
 
-          ctx.strokeStyle = "#00FFD5";
-          ctx.lineWidth = 3;
+          // Same appearance as MediaPipe/OpenCV
+          ctx.strokeStyle = "rgb(224,224,224)";
+          ctx.lineWidth = 2;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+
           ctx.stroke();
 
       });
@@ -79,24 +83,21 @@ function WebcamFeed({ sendFrame }) {
       // Draw joints
       hand.forEach((point) => {
 
-          ctx.beginPath();
+        ctx.beginPath();
 
-          ctx.arc(
-              point.x * canvas.width,
-              point.y * canvas.height,
-              5,
-              0,
-              Math.PI * 2
-          );
+        ctx.arc(
+            point.x * canvas.width,
+            point.y * canvas.height,
+            4,
+            0,
+            Math.PI * 2
+        );
 
-          ctx.fillStyle = "#00FFD5";
+        ctx.fillStyle = "rgb(0,255,255)";
+        ctx.fill();
 
-          ctx.fill();
-
-      });
-
+    });
   });
-
   }, [landmarks]);
 
   // Send webcam frames to backend

@@ -9,18 +9,33 @@ LABELS_FILE = "data/labels.txt"
 
 def load_dataset():
     with open(LABELS_FILE, "r") as f:
-
-        all_labels = [
-
+        master_labels = [
             line.strip()
-
             for line in f
-
             if line.strip()
-
         ]
 
-    label_map = {label: idx for idx, label in enumerate(all_labels)}
+    # Keep only labels that actually have a folder with .npy files
+    all_labels = []
+
+    for label in master_labels:
+
+        folder_path = os.path.join(DATA_PATH, label)
+
+        if os.path.exists(folder_path):
+
+            npy_files = [
+                f for f in os.listdir(folder_path)
+                if f.endswith(".npy")
+            ]
+
+            if len(npy_files) > 0:
+                all_labels.append(label)
+
+    label_map = {
+        label: idx
+        for idx, label in enumerate(all_labels)
+    }
 
     print(f"Labels found : {all_labels}")
     print(f"Label map    : {label_map}")
