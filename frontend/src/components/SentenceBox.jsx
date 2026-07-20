@@ -3,21 +3,39 @@ import { PredictionContext } from "../context/PredictionContext";
 
 function SentenceBox() {
 
-  const { sentence } =
-    useContext(PredictionContext);
+  const {
+    sentence,
+    refinedSentence
+  } = useContext(PredictionContext);
 
   return (
-    <div className="card">
+
+  <div className="card">
 
       <h2>Recognized Sentence</h2>
 
       <textarea
-        rows="6"
-        value={sentence}
-        readOnly
+          rows="2"
+          value={sentence}
+          readOnly
       />
 
-    </div>
+      <h2
+          style={{
+              marginTop:20
+          }}
+      >
+          AI Refined Sentence
+      </h2>
+
+      <textarea
+          rows="3"
+          value={refinedSentence}
+          readOnly
+      />
+
+  </div>
+
   );
 }
 

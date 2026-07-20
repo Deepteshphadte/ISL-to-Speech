@@ -81,6 +81,7 @@ function WebcamFeed({ sendFrame }) {
       });
 
       // Draw joints
+      // Draw joints
       hand.forEach((point) => {
 
         ctx.beginPath();
@@ -88,27 +89,28 @@ function WebcamFeed({ sendFrame }) {
         ctx.arc(
             point.x * canvas.width,
             point.y * canvas.height,
-            4,
+            3,
             0,
             Math.PI * 2
         );
 
-        ctx.fillStyle = "rgb(0,255,255)";
+        ctx.fillStyle = "rgb(255,0,0)";
         ctx.fill();
 
     });
   });
   }, [landmarks]);
 
-  // Send webcam frames to backend
+  // Send webcam frames continuously
   useEffect(() => {
 
-    const interval = setInterval(() => {
+    let animationId;
+
+    const captureFrame = () => {
 
       if (webcamRef.current) {
 
-        const imageSrc =
-          webcamRef.current.getScreenshot();
+        const imageSrc = webcamRef.current.getScreenshot();
 
         if (imageSrc) {
 
@@ -118,9 +120,13 @@ function WebcamFeed({ sendFrame }) {
 
       }
 
-    }, 100);
+      animationId = requestAnimationFrame(captureFrame);
 
-    return () => clearInterval(interval);
+    };
+
+    captureFrame();
+
+    return () => cancelAnimationFrame(animationId);
 
   }, [sendFrame]);
 
@@ -131,13 +137,13 @@ function WebcamFeed({ sendFrame }) {
       <Webcam
           ref={webcamRef}
           audio={false}
-          mirrored={false}
+          mirrored={true}
           screenshotFormat="image/jpeg"
-          screenshotQuality={1}
+          screenshotQuality={0.7}
           forceScreenshotSourceSize={true}
           videoConstraints={{
-              width: 1280,
-              height: 720,
+              width: 640,
+              height: 480,
               facingMode: "user"
           }}
           className="webcam"
