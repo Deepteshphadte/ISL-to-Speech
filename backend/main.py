@@ -43,6 +43,9 @@ def clear_sentence():
     predictor.current_sign = "No Sign"
     predictor.confidence = 0.0
 
+    predictor.refined_sentence = ""
+    predictor.last_spoken_sentence = ""
+
     return {
         "message": "cleared"
     }
@@ -55,6 +58,8 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
 
         image_data = await websocket.receive_text()
+
+        print("Frame Received")
 
         image_data = image_data.split(",")[1]
 
@@ -72,8 +77,23 @@ async def websocket_endpoint(websocket: WebSocket):
             cv2.IMREAD_COLOR
         )
 
+        print("Frame Received")
+
         result = predictor.predict(frame)
+
+        print("Frame Sent")
 
         print("Sending:", result["sign"])
 
+        print("Frame Sent")
+
         await websocket.send_json(result)
+    
+@app.post("/toggle_speech")
+def toggle_speech():
+
+    predictor.auto_speak = not predictor.auto_speak
+
+    return {
+        "auto_speak": predictor.auto_speak
+    }

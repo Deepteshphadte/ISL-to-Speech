@@ -1,12 +1,8 @@
-from google import genai
+from backend.gemini_service import refine_sentence
 
-client = genai.Client(
-    api_key="AIzaSyByNztOSuuYItTn6QxjnJkcnNvE0M7Wlo0"
-)
+sentence = "TODAY ME GO WORK"
 
-response = client.models.generate_content(
-    model="gemini-2.0-flash",
-    contents="Convert this into a meaningful sentence: HELLO THANK_YOU HELP"
-)
+result = refine_sentence(sentence)
 
-print(response.text)
+print("\nOriginal : ", sentence)
+print("Gemini  : ", result)

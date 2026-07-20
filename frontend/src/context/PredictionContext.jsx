@@ -10,6 +10,8 @@ export const PredictionProvider = ({ children }) => {
 
   const [sentence, setSentence] = useState("");
 
+  const [refinedSentence, setRefinedSentence] = useState("");
+
   const [history, setHistory] = useState([]);
 
   const [landmarks, setLandmarks] = useState([]);
@@ -33,6 +35,9 @@ export const PredictionProvider = ({ children }) => {
 
         sentence,
         setSentence,
+
+        refinedSentence,
+        setRefinedSentence,
 
         history,
         setHistory,

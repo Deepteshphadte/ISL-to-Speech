@@ -2,10 +2,10 @@ import { useContext } from "react";
 import { PredictionContext } from "../context/PredictionContext";
 import API from "../api/backend";
 
-function Controls({ speak }) {
+function Controls() {
 
   const {
-    sentence,
+    refinedSentence,
     setSentence,
     setHistory,
     autoSpeak,
@@ -17,7 +17,7 @@ function Controls({ speak }) {
     try {
 
       await navigator.clipboard.writeText(
-        sentence
+        refinedSentence
       );
 
       alert(
@@ -35,7 +35,7 @@ function Controls({ speak }) {
   const exportSentence = () => {
 
     const blob = new Blob(
-      [sentence],
+      [refinedSentence],
       {
         type: "text/plain"
       }
@@ -77,30 +77,41 @@ function Controls({ speak }) {
 
   };
 
+const toggleSpeech = async () => {
+
+    try {
+
+        const response =
+            await API.post("/toggle_speech");
+
+        setAutoSpeak(
+            response.data.auto_speak
+        );
+
+    }
+    catch (error) {
+
+        console.log(error);
+
+    }
+
+};
+
   return (
 
     <div className="card controls-card">
 
-      <button
-        className="speak-btn"
-        onClick={() =>
-          speak(sentence)
-        }
-      >
-        🔊 Speak
-      </button>
 
       <button
-        className="toggle-btn"
-        onClick={() =>{
-          setAutoSpeak(!autoSpeak);
-          console.log("AutoSpeak:", !autoSpeak);
-        }}
+          className="toggle-btn"
+          onClick={toggleSpeech}
       >
-        {autoSpeak
-          ? "🔊 Auto Speak ON"
-          : "🔇 Auto Speak OFF"}
+          {autoSpeak
+              ? "🔊 Auto Speak ON"
+              : "🔇 Auto Speak OFF"}
       </button>
+
+
 
       <button
         className="clear-btn"
