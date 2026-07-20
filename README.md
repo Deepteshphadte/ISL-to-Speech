@@ -232,32 +232,6 @@ http://localhost:5173
 
 ---
 
-# 📷 Screenshots
-
-### Home Page
-
-_Add project screenshot here_
-
----
-
-### Live Gesture Detection
-
-_Add screenshot here_
-
----
-
-### Sentence Generation
-
-_Add screenshot here_
-
----
-
-### Speech Output
-
-_Add screenshot here_
-
----
-
 # 📈 Applications
 
 - Real-time communication
